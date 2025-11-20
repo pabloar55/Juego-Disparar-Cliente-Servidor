@@ -22,7 +22,12 @@ public class Interfaz extends javax.swing.JFrame {
         initComponents();
         this.j1 = new  Player(jLabelJugador1.getX(), jLabelJugador1.getY());
     }
-    
+    public int getXj1(){
+        return jLabelJugador1.getX();
+    }
+        public int getYj1(){
+        return jLabelJugador1.getY();
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -37,14 +42,19 @@ public class Interfaz extends javax.swing.JFrame {
         jLabelJugador2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                formMousePressed(evt);
+            }
+        });
+        addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                formKeyPressed(evt);
+            }
+        });
 
         jLabelJugador1.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
         jLabelJugador1.setText(".");
-        jLabelJugador1.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                jLabelJugador1KeyPressed(evt);
-            }
-        });
 
         jLabelJugador2.setFont(new java.awt.Font("Segoe UI", 0, 48)); // NOI18N
         jLabelJugador2.setText(".");
@@ -76,15 +86,47 @@ public class Interfaz extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jLabelJugador1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jLabelJugador1KeyPressed
+    private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
 
-                    if(evt.getKeyCode()==KeyEvent.VK_UP){
-                       j1.setY(jLabelJugador1.getY());
-                    }
-                
+            j1.setEstaDisparando(true);
+             // TODO add your handling code here:
+    }//GEN-LAST:event_formMousePressed
 
-    }//GEN-LAST:event_jLabelJugador1KeyPressed
+    private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
+int velocidad = 10;
+    int x = jLabelJugador1.getX();
+    int y = jLabelJugador1.getY();
 
+    if (evt.getKeyCode() == KeyEvent.VK_UP) {
+        y -= velocidad;
+    }
+    if (evt.getKeyCode() == KeyEvent.VK_DOWN) {
+        y += velocidad;
+    }
+    if (evt.getKeyCode() == KeyEvent.VK_LEFT) {
+        x -= velocidad;
+    }
+    if (evt.getKeyCode() == KeyEvent.VK_RIGHT) {
+        x += velocidad;
+    }
+
+    // Límites para que no se salga de la ventana
+    x = Math.max(0, Math.min(getWidth() - 50, x));
+    y = Math.max(0, Math.min(getHeight() - 80, y));
+
+    jLabelJugador1.setLocation(x, y);
+
+    // IMPORTANTE: sincronizamos el objeto Player con la posición real del JLabel
+    j1.setX(x);
+    j1.setY(y);      // TODO add your handling code here:
+    }//GEN-LAST:event_formKeyPressed
+public void setLocationJ2(int X, int Y){
+        jLabelJugador2.setLocation(X, Y);
+    }
+public void setLocationJ1(int X, int Y){
+        jLabelJugador1.setLocation(X, Y);
+    }
+                                    
     /**
      * @param args the command line arguments
      */

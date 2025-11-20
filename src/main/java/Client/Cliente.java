@@ -1,66 +1,57 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Client;
 
 import Elementos.Interfaz;
 import Elementos.Player;
-import com.sun.java.accessibility.util.AWTEventMonitor;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-/**
- *
- * @author Diurno
- */
 public class Cliente {
-    Player jugadorLocal;
-    Interfaz i;
     public static void main(String[] args) {
-
-    
         try {
-            Cliente c = new Cliente();
-            c.i = new Interfaz();
-            c.i.setVisible(true);
-            c.jugadorLocal= new Player( 30, 40);
-            String Host = "10.2.8.16";
-            int Puerto = 5000;//puerto remoto
-            
-            System.out.println("PROGRAMA CLIENTE INICIADO....");
-            Socket cliente = new Socket(Host, Puerto);
-            
-            //Flujo de entrada para objetos
-            ObjectInputStream perEnt = new ObjectInputStream(
-                    cliente.getInputStream());
-            //Se recibe un objeto
-            Player jugadorRemoto = (Player) perEnt.readObject();//recibo objeto
-            
-            while(true){
-            //FLUJO DE salida para objetos
-            ObjectOutputStream perSal = new ObjectOutputStream(
-                    cliente.getOutputStream());
-            // Se envia el objeto
-            perSal.writeObject(c.i.j1);
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            Interfaz i = new Interfaz();
+            i.setVisible(true);
 
-    }
-            public void haDisparado(){
-            jugadorLocal.setEstaDisparando(true);
+            String host = "localhost";
+            int puerto = 5000;
+
+            System.out.println("Conectando al servidor...");
+            Socket socket = new Socket(host, puerto);
+            System.out.println("¡Conectado!");
+
+            // ¡IMPORTANTE! Crear ObjectOutputStream PRIMERO
+            ObjectOutputStream salida = new ObjectOutputStream(socket.getOutputStream());
+            salida.flush();  // Necesario para evitar deadlock
+
+            // Luego el ObjectInputStream
+            ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
+
+            // Hilo receptor: actualiza al enemigo
+            new Thread(() -> {
+                try {
+                    while (true) {
+                        Player enemigo = (Player) entrada.readObject();
+                        i.setLocationJ2(enemigo.getX(), enemigo.getY());
+                    }
+                } catch (Exception e) {
+                    System.out.println("Servidor cerrado o enemigo desconectado");
+                }
+            }).start();
+
+            // Bucle principal: enviar nuestra posición
+            while (true) {
+                // Sincronizamos el Player con la posición REAL del JLabel (la que movemos con teclas)
+                i.j1.setX(i.getXj1());
+                i.j1.setY(i.getYj1());
+
+                salida.writeObject(i.j1);
+                salida.flush();
+
+                Thread.sleep(16); // ~60 FPS
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        
-           
-        
+    }
 }

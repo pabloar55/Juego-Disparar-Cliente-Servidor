@@ -1,5 +1,6 @@
 package Elementos;
 
+import java.io.Serializable;
 import javax.swing.JLabel;
 
 /*
@@ -11,7 +12,7 @@ import javax.swing.JLabel;
  *
  * @author Diurno
  */
-public class Player {
+public class Player implements Serializable{
     private int x, y;
     private boolean estaDisparando = false; 
 
